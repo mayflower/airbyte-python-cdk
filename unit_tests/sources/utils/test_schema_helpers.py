@@ -194,7 +194,7 @@ class TestResourceSchemaLoader:
         assert actual_schema == expected_schema
         # Make sure generated schema is JSON serializable
         assert json.dumps(actual_schema)
-        assert jsonref.JsonRef.replace_refs(actual_schema)
+        assert jsonref.replace_refs(actual_schema)
 
 
 @pytest.mark.parametrize(

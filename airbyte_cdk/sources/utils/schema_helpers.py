@@ -47,7 +47,10 @@ def resolve_ref_links(obj: Any) -> Any:
     :return JSON serializable object with references without external dependencies.
     """
     if isinstance(obj, jsonref.JsonRef):
-        obj = resolve_ref_links(obj.__subject__)
+        # In jsonref 1.1.0, JsonRef objects act as proxies to their underlying objects
+        # We can directly convert them to dict instead of accessing ._subject
+        obj_dict = dict(obj)
+        obj = resolve_ref_links(obj_dict)
         # Omit existing definitions for external resource since
         # we dont need it anymore.
         if isinstance(obj, dict):
@@ -155,7 +158,7 @@ class ResourceSchemaLoader:
             base = os.path.dirname(package.__file__) + "/"
         else:
             raise ValueError(f"Package {package} does not have a valid __file__ field")
-        resolved = jsonref.JsonRef.replace_refs(
+        resolved = jsonref.replace_refs(
             raw_schema, loader=JsonFileLoader(base, "schemas/shared"), base_uri=base
         )
         resolved = resolve_ref_links(resolved)
